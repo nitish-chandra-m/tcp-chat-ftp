@@ -45,24 +45,28 @@ public class Chat {
                     ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())
             ) {
                 String msg;
+                String senderName = "";
                 while(!(msg = in.readUTF()).equalsIgnoreCase("BYE")) {
-                    if (msg.toLowerCase().contains("transfer")) {
+                    if (msg.toLowerCase().contains("username")) {
+                        senderName = msg.split(":")[1];
+                    }
+                    else if (msg.toLowerCase().contains("transfer")) {
                         String[] details = msg.split(" ");
                         String filename = details[1];
                         int fileSize = Integer.parseInt(details[2]);
                         try {
-                            System.out.println("Receiving file " + filename);
+                            System.out.println("Receiving file " + filename + " from "+senderName);
                             receiveFile(in, fileSize, filename);
                             System.out.println("File downloaded.");
                         } catch (IOException e) {
                             System.out.println("Error downloading file: " + e.getMessage());
                         }
                     } else {
-                        System.out.println(ANSI_BLUE + "Received message: " + msg + ANSI_RESET);
+                        System.out.println(ANSI_BLUE + senderName + ": " + msg + ANSI_RESET);
                     }
                 }
             } catch (IOException e) {
-                System.out.println("Disconnected");
+                System.out.println("Disconnected from user");
             }
         }
     }
@@ -71,7 +75,9 @@ public class Chat {
         @Override
         public void run() {
             try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
-                System.out.print("Enter the port number of the program you wish to connect to: ");
+                System.out.print("Enter your chat username: ");
+                String username = input.readLine();
+                System.out.print("Enter the port number of the user you wish to connect to: ");
                 String inp = input.readLine();
 
                 handleCtrlC(inp);
@@ -93,7 +99,8 @@ public class Chat {
                         Socket socket = new Socket("localhost", port);
                         ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())
                 ) {
-                    System.out.println("Connected to program on port " + port);
+                    out.writeUTF("USERNAME:"+ username);
+                    System.out.println("Connected to user on port " + port);
                     System.out.println("Send any message you like or say \"transfer <filename>\" to transfer a file.");
 
                     ArrayList<String> exitWords = new ArrayList<>(List.of("exit", "bye", "end"));
