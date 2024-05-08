@@ -17,5 +17,5 @@ _Note: File transfer does not conform fully to FTP standard._
 4. In Alice's terminal, enter Bob's port number.
 5. In Bob's terminal, enter Alice's port number.
 6. Enter messages on both terminals to exchange chat messages.
-7. Type transfer <filename> on either terminal to send a file to the other party.
+7. Use the command `transfer <filename>` on either terminal to send a file to the other peer.
 
