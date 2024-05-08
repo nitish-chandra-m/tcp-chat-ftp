@@ -5,7 +5,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Chat {
     private static final int CHUNK_SIZE = 1024;
@@ -13,25 +12,14 @@ public class Chat {
     public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_CYAN = "\u001B[36m";
 
-    private static int getPort() {
-        Random random = new Random();
-        return random.nextInt(9999 - 1025) + 1025;
-    }
-
     public static void main(String[] args) throws IOException {
-        int port = getPort();
-        System.out.println(ANSI_CYAN + "This program is listening on Port " + port + ANSI_RESET);
 
-        new Writer().start();
-
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (ServerSocket serverSocket = new ServerSocket(0)) {
+            System.out.println(ANSI_CYAN + "This program is listening on Port " + serverSocket.getLocalPort() + ANSI_RESET);
+            new Writer().start();
             listen(serverSocket);
         } catch (BindException e) {
-            System.out.println("Port " + port + " already in use.");
-            port = getPort();
-            try (ServerSocket serverSocket = new ServerSocket(port)) {
-                listen(serverSocket);
-            }
+            System.out.println("Port already in use.");
         }
         catch (IOException e) {
             throw new IOException(e);
